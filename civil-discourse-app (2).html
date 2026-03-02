@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discourse Lab — Civil Discourse Training</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --bg: #0a0c10;
+    --surface: #12151c;
+    --surface2: #1a1f2a;
+    --border: #252b38;
+    --accent: #00e5a0;
+    --accent2: #4d7cff;
+    --accent3: #ff6b6b;
+    --accent4: #ffd166;
+    --text: #e8edf5;
+    --muted: #6b7a99;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display:none; min-height:100vh; }
+  .screen.active { display:flex; flex-direction:column; }
+
+  /* ── NAV ── */
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top:0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .nav-xp {
+    display: flex;
+    gap: 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .nav-xp span { color: var(--accent); }
+
+  /* ── HOME ── */
+  #home {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 32px;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, #00e5a015 0%, transparent 70%);
+  }
+  .home-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .home-title {
+    font-size: clamp(40px, 7vw, 80px);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 16px;
+  }
+  .home-title em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .home-sub {
+    font-size: 17px;
+    color: var(--muted);
+    max-width: 480px;
+    margin: 0 auto 40px;
+    line-height: 1.6;
+  }
+  .btn-row { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .btn {
+    padding: 14px 28px;
+    border-radius: 6px;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+  }
+  .btn-primary:hover { background: #00ffb3; transform: translateY(-1px); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  .home-modes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    max-width: 700px;
+    margin: 50px auto 0;
+  }
+  .mode-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px 18px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .mode-card:hover { border-color: var(--accent); background: var(--surface2); }
+  .mode-icon { font-size: 24px; margin-bottom: 10px; }
+  .mode-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .mode-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .mode-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  /* ── PROGRESSION MAP ── */
+  #progression {
+    flex-direction: column;
+    padding: 0;
+  }
+  .prog-header {
+    padding: 40px 40px 0;
+    text-align: center;
+  }
+  .prog-header h2 {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+  }
+  .prog-header p { color: var(--muted); font-size: 14px; }
+
+  .prog-ladder {
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .level-block {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 0;
+    position: relative;
+  }
+  .level-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 4px;
+  }
+  .level-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: all 0.3s;
+    cursor: pointer;
+    z-index: 2;
+  }
+  .level-dot.unlocked {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: #00e5a015;
+  }
+  .level-dot.current {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--bg);
+    box-shadow: 0 0 20px #00e5a050;
+  }
+  .level-connector {
+    width: 2px;
+    flex: 1;
+    background: var(--border);
+    min-height: 30px;
+  }
+  .level-connector.active { background: var(--accent); }
+
+  .level-content {
+    padding: 0 0 32px 20px;
+  }
+  .level-phase {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .level-name {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .level-sims {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .sim-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .sim-chip.playable {
+    border-color: var(--accent2);
+    color: var(--accent2);
+    cursor: pointer;
+  }
+  .sim-chip.playable:hover { background: #4d7cff20; }
+  .sim-chip.completed {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .skills-needed {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+  .skills-needed strong { color: var(--text); }
+
+  /* ── SIMULATION ── */
+  #simulation {
+    flex-direction: column;
+    padding: 0;
+  }
+  .sim-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    flex: 1;
+    min-height: calc(100vh - 61px);
+  }
+  .sim-sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .sidebar-section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .xp-bar {
+    margin-bottom: 10px;
+  }
+  .xp-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+  .xp-label .name { color: var(--text); font-weight: 500; }
+  .xp-label .val { font-family: var(--mono); color: var(--muted); }
+  .xp-track {
+    height: 4px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .xp-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+  .xp-fill.reg { background: var(--accent3); }
+  .xp-fill.inq { background: var(--accent4); }
+  .xp-fill.lis { background: var(--accent2); }
+  .xp-fill.rea { background: #c77dff; }
+  .xp-fill.int { background: var(--accent); }
+
+  .round-tracker {
+    display: flex;
+    gap: 6px;
+  }
+  .round-pip {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    transition: all 0.3s;
+  }
+  .round-pip.done { background: var(--accent); border-color: var(--accent); color: var(--bg); font-size: 14px; }
+  .round-pip.active { border-color: var(--accent2); color: var(--accent2); }
+
+  .hint-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    flex: 1;
+  }
+  .hint-box strong { color: var(--accent); display: block; margin-bottom: 6px; font-family: var(--mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
+
+  .sim-main {
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    overflow-y: auto;
+  }
+  .sim-scenario-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .sim-round-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .sim-round-title {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .skill-badge {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .speech-bubble {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    position: relative;
+  }
+  .speaker-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .speech-text {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--text);
+  }
+  .speech-text em {
+    font-style: italic;
+    color: var(--accent4);
+  }
+
+  .prompt-text {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .choice-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    text-align: left;
+    cursor: pointer;
+    font-family: var(--sans);
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.5;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .choice-btn:hover:not(:disabled) { border-color: var(--accent2); background: var(--surface2); }
+  .choice-btn.correct { border-color: var(--accent) !important; background: #00e5a015 !important; }
+  .choice-btn.wrong { border-color: var(--accent3) !important; background: #ff6b6b10 !important; }
+  .choice-btn.missed { border-color: var(--accent) !important; opacity: 0.5; }
+  .choice-btn:disabled { cursor: default; }
+  .choice-letter {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-right: 10px;
+  }
+
+  .feedback-box {
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 14px;
+    line-height: 1.6;
+    animation: fadeIn 0.3s ease;
+  }
+  .feedback-box.good { background: #00e5a015; border: 1px solid #00e5a040; }
+  .feedback-box.ok { background: #ffd16615; border: 1px solid #ffd16640; }
+  .feedback-box.bad { background: #ff6b6b10; border: 1px solid #ff6b6b30; }
+  .feedback-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .feedback-box.good .feedback-title { color: var(--accent); }
+  .feedback-box.ok .feedback-title { color: var(--accent4); }
+  .feedback-box.bad .feedback-title { color: var(--accent3); }
+
+  .continue-btn {
+    align-self: flex-start;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 6px;
+    padding: 12px 24px;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    animation: fadeIn 0.4s ease;
+  }
+  .continue-btn:hover { background: #00ffb3; }
+
+  /* ── END SCREEN ── */
+  #endscreen {
+    justify-content: center;
+    align-items: center;
+    padding: 60px 32px;
+    text-align: center;
+    background: radial-gradient(ellipse 60% 50% at 50% 0%, #00e5a012 0%, transparent 70%);
+  }
+  .end-title {
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 700;
+    letter-spacing: -1.5px;
+    margin-bottom: 12px;
+  }
+  .end-subtitle {
+    font-size: 16px;
+    color: var(--muted);
+    margin-bottom: 40px;
+  }
+  .end-results {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    max-width: 700px;
+    margin: 0 auto 40px;
+  }
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 12px;
+    text-align: center;
+  }
+  .result-card.highlight { border-color: var(--accent); background: #00e5a010; }
+  .result-icon { font-size: 20px; margin-bottom: 8px; }
+  .result-name { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .result-score {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .result-card.highlight .result-score { color: var(--accent); }
+
+  .unlock-banner {
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 20px 28px;
+    max-width: 500px;
+    margin: 0 auto 32px;
+    display: none;
+  }
+  .unlock-banner.show { display: block; }
+  .unlock-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .unlock-text { font-size: 15px; font-weight: 600; }
+
+  .outcome-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .outcome-text {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 32px;
+  }
+
+  /* ── TWINE EXPORT ── */
+  #twineview {
+    flex-direction: column;
+    padding: 40px;
+    max-width: 1000px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  #twineview h2 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  #twineview p { color: var(--muted); margin-bottom: 24px; font-size: 14px; }
+  .twine-code {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.8;
+    color: #a8d8a8;
+    white-space: pre;
+    overflow-x: auto;
+    max-height: 70vh;
+    overflow-y: auto;
+    tab-size: 2;
+  }
+  .twine-comment { color: var(--muted); }
+  .twine-macro { color: var(--accent4); }
+  .twine-link { color: var(--accent2); }
+  .twine-var { color: var(--accent3); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in { animation: fadeIn 0.3s ease; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .home-modes { grid-template-columns: 1fr; max-width: 360px; }
+    .sim-layout { grid-template-columns: 1fr; }
+    .sim-sidebar { display: none; }
+    .end-results { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  /* XP flash animation */
+  .xp-flash {
+    animation: xpFlash 0.6s ease;
+  }
+  @keyframes xpFlash {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+
+  .back-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 16px;
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: all 0.15s;
+  }
+  .back-btn:hover { color: var(--text); border-color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     NAV
+═══════════════════════════════════════ -->
+<nav>
+  <div class="logo">◈ Discourse Lab</div>
+  <div class="nav-xp">
+    <div>REG <span id="nav-reg">0</span></div>
+    <div>INQ <span id="nav-inq">0</span></div>
+    <div>LIS <span id="nav-lis">0</span></div>
+    <div>REA <span id="nav-rea">0</span></div>
+    <div>INT <span id="nav-int">0</span></div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════
+     HOME SCREEN
+═══════════════════════════════════════ -->
+<div id="home" class="screen active">
+  <div class="home-tag">Training System v1.0</div>
+  <h1 class="home-title">Master the<br><em>Art of Discourse</em></h1>
+  <p class="home-sub">Strategic conversation skills for high-stakes situations. Train your regulation, curiosity, and reasoning — not your opinions.</p>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="showScreen('progression')">View Progression Map</button>
+    <button class="btn btn-secondary" onclick="startSim()">Play Simulation</button>
+    <button class="btn btn-secondary" onclick="showScreen('twineview')">Twine Export Code</button>
+  </div>
+
+  <div class="home-modes">
+    <div class="mode-card" onclick="showScreen('progression')">
+      <div class="mode-icon">🗺</div>
+      <div class="mode-label">Progression</div>
+      <div class="mode-title">10 Simulation Ladder</div>
+      <div class="mode-desc">See how simulations build from regulation basics to full integration.</div>
+    </div>
+    <div class="mode-card" onclick="startSim()">
+      <div class="mode-icon">⚡</div>
+      <div class="mode-label">Play Now</div>
+      <div class="mode-title">The Group Project</div>
+      <div class="mode-desc">Navigate a peer conflict across 6 rounds. Every choice affects your outcome.</div>
+    </div>
+    <div class="mode-card" onclick="showScreen('twineview')">
+      <div class="mode-icon">📋</div>
+      <div class="mode-label">Export</div>
+      <div class="mode-title">Twine Passage Code</div>
+      <div class="mode-desc">Complete Sugarcane-compatible code ready to paste into Twine.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PROGRESSION MAP
+═══════════════════════════════════════ -->
+<div id="progression" class="screen">
+  <div class="prog-header">
+    <h2>10-Simulation Progression Ladder</h2>
+    <p>Each simulation unlocks the next. Skills compound. Difficulty scales with mastery.</p>
+  </div>
+  <div class="prog-ladder" id="prog-ladder"></div>
+  <div style="text-align:center; padding: 0 0 40px;">
+    <button class="btn btn-primary" onclick="startSim()">Play Simulation 1 →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SIMULATION
+═══════════════════════════════════════ -->
+<div id="simulation" class="screen">
+  <div class="sim-layout">
+    <!-- Sidebar -->
+    <div class="sim-sidebar">
+      <div>
+        <div class="sidebar-section-label">XP Tracker</div>
+        <div id="xp-bars"></div>
+      </div>
+      <div>
+        <div class="sidebar-section-label">Rounds</div>
+        <div class="round-tracker" id="round-pips"></div>
+      </div>
+      <div class="hint-box" id="hint-box">
+        <strong>◈ Skill Focus</strong>
+        Choose your responses carefully. Your choices build or break conversation outcomes.
+      </div>
+    </div>
+    <!-- Main area -->
+    <div class="sim-main" id="sim-main"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     END SCREEN
+═══════════════════════════════════════ -->
+<div id="endscreen" class="screen">
+  <div class="outcome-label">Simulation Complete</div>
+  <div class="end-title" id="end-title">Strong Listener</div>
+  <div class="end-subtitle" id="end-subtitle">You demonstrated clear strengths. Here's your breakdown:</div>
+  <div class="end-results" id="end-results"></div>
+  <div class="unlock-banner" id="unlock-banner">
+    <div class="unlock-label">🔓 Unlocked</div>
+    <div class="unlock-text" id="unlock-text">Advanced Simulation Mode</div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="startSim()">Play Again</button>
+    <button class="btn btn-secondary" onclick="showScreen('progression')">Progression Map</button>
+    <button class="btn btn-secondary" onclick="showScreen('home')">Home</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TWINE EXPORT
+═══════════════════════════════════════ -->
+<div id="twineview" class="screen">
+  <button class="back-btn" onclick="showScreen('home')" style="align-self:flex-start; margin-bottom:20px;">← Back</button>
+  <h2>Twine / SugarCube Passage Code</h2>
+  <p>Paste into Twine (SugarCube format). Each passage maps to one simulation round. XP variables persist via SugarCube's <code>$variables</code>.</p>
+  <div class="twine-code" id="twine-code"></div>
+  <div style="margin-top:20px;">
+    <button class="btn btn-primary" onclick="copyTwine()">Copy All Code</button>
+    <button class="btn btn-secondary" style="margin-left:12px;" onclick="showScreen('home')">Back</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+const state = {
+  xp: { reg: 0, inq: 0, lis: 0, rea: 0, int: 0 },
+  currentRound: 0,
+  roundResults: [],
+  flags: { regulationFailed: false, advancedUnlocked: false }
+};
+
+// ══════════════════════════════════════
+// PROGRESSION DATA
+// ══════════════════════════════════════
+const progressionLevels = [
+  {
+    phase: "Level 1 — Regulation",
+    name: "Self-Management Foundations",
+    color: "#ff6b6b",
+    skills: ["Emotion Labeling", "Pause Protocol", "Goal Selection"],
+    sims: [
+      { id: 1, title: "The Homework Clash", status: "playable", desc: "Emotion identification under peer pressure" },
+      { id: 2, title: "The Lunch Table", status: "playable", desc: "Pause protocol when excluded" }
+    ],
+    mastery: "Regulate before speaking in 2 consecutive sims"
+  },
+  {
+    phase: "Level 2 — Curiosity",
+    name: "Ask Before You Assert",
+    color: "#ffd166",
+    skills: ["Ask-Before-Assert", "Open Questions", "Uncertainty Admission"],
+    sims: [
+      { id: 3, title: "The Unfair Grade", status: "locked", desc: "Ask your way to understanding" },
+      { id: 4, title: "The Rumor", status: "locked", desc: "Inquiry vs. accusation" }
+    ],
+    mastery: "Earn Inquiry XP ≥ 4 in a single sim"
+  },
+  {
+    phase: "Level 3 — Listening",
+    name: "Precision Listening",
+    color: "#4d7cff",
+    skills: ["Accurate Paraphrasing", "Meaning Check", "Fact vs. Opinion"],
+    sims: [
+      { id: 5, title: "The Group Project", status: "playable", desc: "Full 6-round simulation — PLAYABLE NOW", featured: true },
+    ],
+    mastery: "Receive speaker confirmation 3 times"
+  },
+  {
+    phase: "Level 4 — Empathy",
+    name: "Structured Perspective-Taking",
+    color: "#c77dff",
+    skills: ["Perspective Reconstruction", "Value Inference", "Steel-Man"],
+    sims: [
+      { id: 6, title: "Two Sides of the Rule", status: "locked", desc: "Steel-man an unpopular position" },
+    ],
+    mastery: "Opponent confirms summary is fair"
+  },
+  {
+    phase: "Level 5 — Reasoning",
+    name: "Evidence & Contribution",
+    color: "#00e5a0",
+    skills: ["Reason-Evidence Pairing", "Proportional Disagreement", "Shared-Goal Naming"],
+    sims: [
+      { id: 7, title: "The Budget Vote", status: "locked", desc: "Build and defend a position with evidence" },
+      { id: 8, title: "Screen Time Debate", status: "locked", desc: "Proportional disagreement under pressure" }
+    ],
+    mastery: "Evidence clarity + limitation acknowledged"
+  },
+  {
+    phase: "Level 6 — Integration",
+    name: "Collaborative Meaning-Making",
+    color: "#00e5a0",
+    skills: ["Common Ground", "Trade-off Acknowledgment", "Position Revision"],
+    sims: [
+      { id: 9, title: "The School Policy", status: "locked", desc: "Synthesize competing positions" },
+      { id: 10, title: "Advanced Mode — Open Conflict", status: "locked", desc: "Full variable-state integration sim" }
+    ],
+    mastery: "Produce a joint synthesis statement"
+  }
+];
+
+// ══════════════════════════════════════
+// SIMULATION DATA — "The Group Project"
+// ══════════════════════════════════════
+const simulation = {
+  title: "The Group Project Conflict",
+  context: "You're in a group project. A classmate says: \"We shouldn't have to do equal work. Some people are just better at this stuff.\"",
+  goal: "Navigate without escalating — while actually advancing understanding.",
+  rounds: [
+    {
+      id: 1,
+      label: "Round 1",
+      title: "Regulation Gate",
+      skill: "Pause Protocol",
+      hint: "Your first move sets the tone for everything that follows. React immediately and the conversation degrades. Pause and you unlock better paths.",
+      prompt: "Your classmate just said something that feels unfair. What do you do first?",
+      speech: null,
+      choices: [
+        { text: "\"That's unfair and you know it.\"", xp: { reg: -1 }, quality: "bad", feedback: "Jumping straight to a counter-reaction signals defensiveness. Your classmate will close off — and you've lost the regulation gate before the conversation even starts.", label: "Reactive" },
+        { text: "Take one breath. Decide your goal: understand or persuade.", xp: { reg: 1 }, quality: "good", feedback: "Correct move. One breath creates just enough separation between stimulus and response. You've chosen understanding — which unlocks better branches later.", label: "Regulated" },
+        { text: "Interrupt and explain why equal work matters.", xp: { reg: -2 }, quality: "bad", feedback: "Interrupting here signals that you're more interested in winning than understanding. Heavy regulation penalty — later rounds become less forgiving.", label: "Override" }
+      ],
+      correct: 1
+    },
+    {
+      id: 2,
+      label: "Round 2",
+      title: "Curiosity Layer",
+      skill: "Open Question Formation",
+      hint: "The best question doesn't sound like an accusation. Neutral phrasing keeps the other person from going defensive.",
+      prompt: "You decide to respond carefully. What do you say first?",
+      speech: null,
+      choices: [
+        { text: "\"Why would you even think that?\"", xp: { inq: 0 }, quality: "ok", feedback: "The question is open, but the tone implies judgment. 'Even think' signals you find the view absurd — your classmate will feel attacked, not heard.", label: "Leading" },
+        { text: "\"What makes you feel that way about the project?\"", xp: { inq: 2 }, quality: "good", feedback: "+2 Inquiry XP. Clean, neutral, genuinely curious. No embedded judgment. This is exactly what a high-quality open question looks like — and it unlocks a bonus branch later.", label: "Curious" },
+        { text: "\"So you just don't want to work?\"", xp: { inq: -1 }, quality: "bad", feedback: "This is a closed, leading question that assumes bad intent. You've made a judgment call disguised as a question. Inquiry XP penalty.", label: "Accusatory" }
+      ],
+      correct: 1
+    },
+    {
+      id: 3,
+      label: "Round 3",
+      title: "Paraphrase Accuracy",
+      skill: "Accurate Paraphrasing",
+      hint: "A paraphrase isn't a summary of what you *think* they meant — it's what they actually said. Distorting it, even slightly, breaks trust.",
+      speech: { speaker: "Your classmate responds:", text: "\"I just think if someone's good at something, they should focus on that part — instead of slowing everyone down with stuff they're not good at.\"" },
+      prompt: "Paraphrase their position in your own words:",
+      choices: [
+        { text: "\"You think some people are just lazy and dragging the group down.\"", xp: { lis: 0 }, quality: "bad", feedback: "You've added an interpretation ('lazy') that wasn't in what they said. That distortion will feel unfair to your classmate — and shows you weren't really listening.", label: "Distorted" },
+        { text: "\"You're saying people should contribute based on their strengths, not equal splits.\"", xp: { lis: 2 }, quality: "good", feedback: "+2 Listening XP. Accurate. You captured their actual argument — strength-based contribution — without inserting your own value judgment about fairness. Your classmate will feel heard.", label: "Accurate" },
+        { text: "\"You don't want to do your equal share of the work.\"", xp: { lis: 0 }, quality: "bad", feedback: "This reframed their efficiency argument as personal avoidance — a very different claim. Paraphrase must capture their meaning, not your interpretation of their motive.", label: "Reframed" }
+      ],
+      correct: 1,
+      retryBonus: { lis: 1 }
+    },
+    {
+      id: 4,
+      label: "Round 4",
+      title: "Structured Empathy",
+      skill: "Humanization & Value Inference",
+      hint: "Empathy here isn't agreement — it's identifying what value is driving their view. They're not wrong to care about project quality. Name that.",
+      speech: { speaker: "After your paraphrase, they add:", text: "\"I've been in groups before where one person ruins everything because they won't admit what they're bad at. It's really frustrating.\"" },
+      prompt: "Choose the strongest humanizing response:",
+      choices: [
+        { text: "\"It sounds like you care about the project actually succeeding — not just going through the motions.\"", xp: { lis: 2 }, quality: "good", feedback: "+2 Empathy XP. You named the underlying value (project success, quality outcomes) without validating their specific solution. That's the difference between empathy and agreement.", label: "Value Named" },
+        { text: "\"You're wrong — fairness matters more than efficiency.\"", xp: {}, quality: "bad", feedback: "You've jumped to your counter-position before the other person feels understood. Even if you're right about fairness, saying it here shuts the conversation down.", label: "Counter" },
+        { text: "\"That's really selfish thinking.\"", xp: { reg: -1 }, quality: "bad", feedback: "Moral judgment without prior understanding. This destroys whatever trust the paraphrase built. Regulation penalty — you've escalated.", label: "Judgmental" }
+      ],
+      correct: 0,
+      advancedPath: {
+        condition: (s) => s.xp.inq >= 2 && s.xp.lis >= 2,
+        text: "\"You want this group to actually succeed — not just be 'fair' on paper while the project suffers, right?\"",
+        bonus: { lis: 1, inq: 1 },
+        feedbackTitle: "Advanced Path Unlocked!",
+        feedback: "+2 Bonus XP. You connected their efficiency concern directly to shared success — bridging their position with a goal you both hold. This is steel-manning in action."
+      }
+    },
+    {
+      id: 5,
+      label: "Round 5",
+      title: "Evidence Contribution",
+      skill: "Reason–Evidence Pairing",
+      hint: "You're not just asserting your view — you're building a case. Specific evidence with an acknowledged limitation is far stronger than a confident claim.",
+      speech: { speaker: "Opening for your position:", text: "\"OK so what do you think we should do instead?\"" },
+      prompt: "How do you build your case for equal participation?",
+      choices: [
+        { text: "\"Research on group learning shows that when students participate equally, everyone learns more — including the stronger students.\"", xp: { rea: 2 }, quality: "good", feedback: "+2 Reasoning XP. Specific claim, backed by a referenced category of evidence. You've grounded your position in something beyond personal preference.", label: "Evidence-Based" },
+        { text: "\"I just disagree with you. Equal work is the right way.\"", xp: {}, quality: "bad", feedback: "This is an assertion without a reason. It tells your classmate nothing about *why* equal participation matters — just that you prefer it. No reasoning XP.", label: "Assertion Only" },
+        { text: "\"Everyone knows equal work is better. That's just how group projects work.\"", xp: {}, quality: "bad", feedback: "'Everyone knows' is the weakest possible form of evidence — it appeals to assumed consensus rather than actual reasoning. No XP awarded.", label: "Vague Appeal" }
+      ],
+      correct: 0,
+      evidenceBonus: {
+        prompt: "Strong choice. Can you add one limitation to your evidence?",
+        choices: [
+          { text: "\"Though this works best when tasks are genuinely teachable — if someone truly can't contribute, forced participation might hurt quality.\"", xp: { rea: 1 }, feedback: "+1 Evidence Clarity Bonus. Acknowledging limitations actually strengthens your credibility — it shows intellectual honesty.", quality: "good" },
+          { text: "\"Actually, the research is always right on this one.\"", xp: {}, feedback: "Overclaiming weakens your argument. Good evidence has acknowledged scope.", quality: "ok" }
+        ]
+      }
+    },
+    {
+      id: 6,
+      label: "Round 6",
+      title: "Integration",
+      skill: "Shared-Goal Naming + Synthesis",
+      hint: "Integration isn't compromise for its own sake — it's finding the move that advances both people's actual goals simultaneously.",
+      speech: { speaker: "The conversation is at a crossroads:", text: "\"So we still don't agree on how to split the work. What now?\"" },
+      prompt: "What's your strongest next move?",
+      choices: [
+        { text: "\"We both want this project to actually be good — and we both want it to be fair. What if we split by strengths, but with a floor: everyone has to contribute meaningfully to each section?\"", xp: { int: 3 }, quality: "good", feedback: "+3 Integration XP. You named the shared goal, acknowledged the legitimate tension, and proposed a synthesis that honors both values. This is what collaborative meaning-making looks like.", label: "Synthesis" },
+        { text: "\"We're doing equal work. That's the rule and that's final.\"", xp: { int: 0 }, quality: "bad", feedback: "Positional hardening. You've used authority rather than reasoning — and ignored everything your classmate shared. Integration ending is now locked.", label: "Positional" },
+        { text: "\"Fine. Whatever you want. I give up.\"", xp: { int: 0 }, quality: "bad", feedback: "Conflict avoidance isn't resolution — it's withdrawal. The project will still have unresolved tension. No integration XP awarded.", label: "Withdrawal" }
+      ],
+      correct: 0
+    }
+  ]
+};
+
+// ══════════════════════════════════════
+// TWINE CODE
+// ══════════════════════════════════════
+const twineCode = `:: StoryTitle
+The Group Project Conflict — Discourse Lab
+
+:: StoryData
+{
+  "ifid": "DISCOURSE-LAB-001",
+  "format": "SugarCube",
+  "format-version": "2.36.1"
+}
+
+:: Start
+<<set $regXP to 0>>
+<<set $inqXP to 0>>
+<<set $lisXP to 0>>
+<<set $reaXP to 0>>
+<<set $intXP to 0>>
+<<set $regFailed to false>>
+<<set $advancedPath to false>>
+
+/% ───────────────────────────────────
+   SCENARIO INTRO
+─────────────────────────────────── %/
+# The Group Project Conflict
+
+You're in a group project meeting. One student says:
+
+> //"We shouldn't have to do equal work. 
+>   Some people are just better at this stuff."//
+
+**Your Goal:** Navigate this without escalating — while actually advancing understanding.
+
+[[Begin Round 1 — Regulation Gate|Round1]]
+
+:: Round1
+/% SKILL: Pause Protocol — Binary gate %/
+# Round 1 — Regulation Gate
+
+What do you do first?
+
+[[→ "That's unfair and you know it."|Round1_Bad_A]]
+[[→ Take one breath. Choose your goal: understand.|Round1_Good]]
+[[→ Interrupt and explain why equal work matters.|Round1_Bad_C]]
+
+:: Round1_Bad_A
+<<set $regXP to $regXP - 1>>
+<<if $regXP lt 0>><<set $regFailed to true>><</if>>
+
+⚠️ **Reactive Move** — Regulation XP: <<print $regXP>>
+
+Jumping to a counter-reaction signals defensiveness. Later rounds will be less forgiving.
+
+[[Continue to Round 2|Round2]]
+
+:: Round1_Good
+<<set $regXP to $regXP + 1>>
+
+✓ **Regulated** — Regulation XP: <<print $regXP>>
+
+One breath creates space. You've chosen understanding — better branches ahead.
+
+[[Continue to Round 2|Round2]]
+
+:: Round1_Bad_C
+<<set $regXP to $regXP - 2>>
+<<set $regFailed to true>>
+
+⚠️ **Override Attempt** — Regulation XP: <<print $regXP>>
+
+Interrupting costs you heavily. Regulation penalty applied.
+
+[[Continue to Round 2|Round2]]
+
+:: Round2
+/% SKILL: Open Question Formation %/
+# Round 2 — Curiosity Layer
+
+You decide to respond carefully. What do you say?
+
+[[→ "Why would you even think that?"|Round2_OK]]
+[[→ "What makes you feel that way about the project?"|Round2_Good]]
+[[→ "So you just don't want to work?"|Round2_Bad]]
+
+:: Round2_OK
+<<set $inqXP to $inqXP + 0>>
+
+△ **Leading Tone** — Inquiry XP: <<print $inqXP>>
+
+Open question but implied judgment. Classmate may feel judged, not heard.
+
+[[Continue to Round 3|Round3]]
+
+:: Round2_Good
+<<set $inqXP to $inqXP + 2>>
+
+✓ **Strong Question** — Inquiry XP: <<print $inqXP>>
+
+Neutral. Genuinely curious. No embedded judgment. Bonus path available later.
+
+[[Continue to Round 3|Round3]]
+
+:: Round2_Bad
+<<set $inqXP to $inqXP - 1>>
+
+⚠️ **Accusatory** — Inquiry XP: <<print $inqXP>>
+
+Closed and judgmental. This is an accusation wearing a question mark.
+
+[[Continue to Round 3|Round3]]
+
+:: Round3
+/% SKILL: Accurate Paraphrasing %/
+# Round 3 — Paraphrase Accuracy
+
+Classmate: //"I just think if someone's good at something, they should focus on 
+that part — instead of slowing everyone down with stuff they're not good at."//
+
+Choose your best paraphrase:
+
+[[→ "You think some people are lazy and dragging the group down."|Round3_Bad_A]]
+[[→ "You're saying people should contribute based on their strengths."|Round3_Good]]
+[[→ "You don't want to do your equal share."|Round3_Bad_C]]
+
+:: Round3_Good
+<<set $lisXP to $lisXP + 2>>
+
+✓ **Accurate Paraphrase** — Listening XP: <<print $lisXP>>
+
+You captured their actual argument without inserting your interpretation.
+
+[[Continue to Round 4|Round4]]
+
+:: Round3_Bad_A
+<<set $lisXP to $lisXP + 0>>
+
+△ **Distorted** — Listening XP: <<print $lisXP>>
+
+You added "lazy" — an interpretation they didn't make. Try again for recovery XP.
+
+[[→ Try again: "You're saying people should contribute based on their strengths."|Round3_Retry]]
+[[→ Move on|Round4]]
+
+:: Round3_Retry
+<<set $lisXP to $lisXP + 1>>
+
+✓ **Recovery** — +1 Bonus Listening XP: <<print $lisXP>>
+
+Correction accepted. Recovery XP awarded.
+
+[[Continue to Round 4|Round4]]
+
+:: Round3_Bad_C
+△ Reframed their efficiency argument as personal avoidance.
+
+[[Continue to Round 4|Round4]]
+
+:: Round4
+/% SKILL: Humanization + Value Inference %/
+# Round 4 — Structured Empathy
+
+Classmate: //"I've been in groups where one person ruins everything because they 
+won't admit what they're bad at. It's really frustrating."//
+
+Choose your response:
+
+<<if $inqXP gte 2 and $lisXP gte 2>>
+  🔓 //Advanced path available — your curiosity and listening unlocked it.//
+  [[→ ADVANCED: "You want the group to succeed — not just be fair on paper while the project suffers, right?"|Round4_Advanced]]
+<</if>>
+[[→ "It sounds like you care about the project actually succeeding."|Round4_Good]]
+[[→ "You're wrong — fairness matters more than efficiency."|Round4_Bad_A]]
+[[→ "That's really selfish thinking."|Round4_Bad_B]]
+
+:: Round4_Advanced
+<<set $lisXP to $lisXP + 1>>
+<<set $inqXP to $inqXP + 1>>
+<<set $advancedPath to true>>
+
+🔓 **Advanced Path** — +2 Bonus XP | Listening: <<print $lisXP>> | Inquiry: <<print $inqXP>>
+
+You bridged their efficiency concern with your shared goal. This is steel-manning.
+
+[[Continue to Round 5|Round5]]
+
+:: Round4_Good
+<<set $lisXP to $lisXP + 2>>
+
+✓ **Value Named** — Listening XP: <<print $lisXP>>
+
+Named the underlying value without validating the specific solution. Empathy, not agreement.
+
+[[Continue to Round 5|Round5]]
+
+:: Round4_Bad_A
+△ Counter before understanding = conversation closed.
+
+[[Continue to Round 5|Round5]]
+
+:: Round4_Bad_B
+<<set $regXP to $regXP - 1>>
+⚠️ Moral judgment destroys built trust. Regulation penalty.
+
+[[Continue to Round 5|Round5]]
+
+:: Round5
+/% SKILL: Reason–Evidence Pairing %/
+# Round 5 — Evidence Contribution
+
+Classmate: //"OK so what do you think we should do instead?"//
+
+How do you build your case?
+
+[[→ "Research on group learning shows equal participation improves outcomes for everyone."|Round5_Good]]
+[[→ "I just disagree. Equal work is right."|Round5_Bad_A]]
+[[→ "Everyone knows equal work is better."|Round5_Bad_B]]
+
+:: Round5_Good
+<<set $reaXP to $reaXP + 2>>
+
+✓ **Evidence-Based** — Reasoning XP: <<print $reaXP>>
+
+Grounded in a referenced evidence category. Want to add a limitation?
+
+[[→ "Though it works best when tasks are teachable — forced participation can hurt quality."|Round5_Bonus]]
+[[→ "Actually the research is always right on this."|Round5_NoBonus]]
+[[→ Continue without limitation|Round6]]
+
+:: Round5_Bonus
+<<set $reaXP to $reaXP + 1>>
+
+✓ **Evidence Clarity Bonus** — Reasoning XP: <<print $reaXP>>
+
+Acknowledging limitations strengthens credibility. Intellectual honesty rewarded.
+
+[[Continue to Round 6|Round6]]
+
+:: Round5_NoBonus
+△ Overclaiming weakens your argument. No bonus XP.
+
+[[Continue to Round 6|Round6]]
+
+:: Round5_Bad_A
+△ Assertion without reasoning. No XP awarded.
+[[Continue to Round 6|Round6]]
+
+:: Round5_Bad_B
+△ "Everyone knows" = weakest evidence form. No XP.
+[[Continue to Round 6|Round6]]
+
+:: Round6
+/% SKILL: Synthesis + Shared-Goal Naming %/
+# Round 6 — Integration
+
+Classmate: //"So we still don't agree on how to split the work. What now?"//
+
+[[→ "We both want this to be good AND fair. Split by strengths — but everyone contributes meaningfully to each section."|Round6_Good]]
+[[→ "Equal work. That's the rule. Final."|Round6_Bad_A]]
+[[→ "Fine. Whatever you want."|Round6_Bad_B]]
+
+:: Round6_Good
+<<set $intXP to $intXP + 3>>
+
+✓ **Synthesis** — Integration XP: <<print $intXP>>
+
+Named shared goal. Acknowledged tension. Proposed a synthesis honoring both values.
+
+[[→ View Results|Results]]
+
+:: Round6_Bad_A
+△ Positional hardening. Integration ending locked.
+[[→ View Results|Results]]
+
+:: Round6_Bad_B
+△ Withdrawal ≠ resolution.
+[[→ View Results|Results]]
+
+:: Results
+# Simulation Complete
+
+**Your XP Summary:**
+| Category | XP |
+|---|---|
+| Regulation | <<print $regXP>> |
+| Inquiry | <<print $inqXP>> |
+| Listening | <<print $lisXP>> |
+| Reasoning | <<print $reaXP>> |
+| Integration | <<print $intXP>> |
+
+<<if $regXP gte 1 and $lisXP gte 2 and $inqXP gte 2>>
+  🔓 **ADVANCED MODE UNLOCKED**
+  You demonstrated foundational mastery. Advanced simulations are now available.
+<<elseif $lisXP gte 3>>
+  ⭐ **Strong Listener** — Your paraphrasing and empathy are a genuine strength.
+<<elseif $inqXP gte 3>>
+  ⭐ **Curious Investigator** — Your questioning kept the conversation open.
+<<else>>
+  ◎ **Partial Stability** — You stayed in the conversation. Review regulation and listening for higher outcomes.
+<</if>>
+
+[[Play Again|Start]]`;
+
+// ══════════════════════════════════════
+// RENDER FUNCTIONS
+// ══════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'progression') renderProgression();
+  if (id === 'twineview') renderTwine();
+}
+
+function renderProgression() {
+  const container = document.getElementById('prog-ladder');
+  container.innerHTML = '';
+  progressionLevels.forEach((level, i) => {
+    const block = document.createElement('div');
+    block.className = 'level-block';
+    const isLast = i === progressionLevels.length - 1;
+    const dotClass = i === 0 ? 'level-dot current' : (i <= 1 ? 'level-dot unlocked' : 'level-dot');
+    const connClass = i < 1 ? 'level-connector active' : 'level-connector';
+    block.innerHTML = `
+      <div class="level-line">
+        <div class="${dotClass}" style="${i === 0 ? 'background:'+level.color+';border-color:'+level.color+';color:#0a0c10' : (i<=1?'border-color:'+level.color+';color:'+level.color:'')}">${i+1}</div>
+        ${!isLast ? `<div class="${connClass}" style="${i<1?'background:'+level.color+';opacity:0.4':''}"></div>` : ''}
+      </div>
+      <div class="level-content">
+        <div class="level-phase">${level.phase}</div>
+        <div class="level-name">${level.name}</div>
+        <div class="skills-needed"><strong>Core Skills:</strong> ${level.skills.join(' · ')}</div>
+        <div class="level-sims">
+          ${level.sims.map(s => `
+            <div class="sim-chip ${s.featured ? 'playable' : (s.status === 'playable' ? 'playable' : '')}"
+              ${s.featured ? 'onclick="startSim()"' : ''}
+              title="${s.desc}">
+              ${s.status === 'locked' ? '🔒 ' : (s.featured ? '▶ ' : '')}Sim ${s.id}: ${s.title}
+            </div>
+          `).join('')}
+        </div>
+        <div class="skills-needed" style="margin-top:6px; color: #6b7a99; font-style:italic">Mastery: ${level.mastery}</div>
+      </div>
+    `;
+    container.appendChild(block);
+  });
+}
+
+function renderTwine() {
+  document.getElementById('twine-code').textContent = twineCode;
+}
+
+function copyTwine() {
+  navigator.clipboard.writeText(twineCode).then(() => {
+    const btn = document.querySelector('#twineview .btn-primary');
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = 'Copy All Code', 2000);
+  });
+}
+
+// ══════════════════════════════════════
+// SIMULATION ENGINE
+// ══════════════════════════════════════
+function startSim() {
+  state.xp = { reg: 0, inq: 0, lis: 0, rea: 0, int: 0 };
+  state.currentRound = 0;
+  state.roundResults = [];
+  state.flags = { regulationFailed: false, advancedUnlocked: false };
+  updateNavXP();
+  showScreen('simulation');
+  buildSidebarXP();
+  buildRoundPips();
+  renderRound(0);
+}
+
+function buildSidebarXP() {
+  const bars = document.getElementById('xp-bars');
+  bars.innerHTML = ['reg','inq','lis','rea','int'].map(k => `
+    <div class="xp-bar">
+      <div class="xp-label">
+        <span class="name">{{ ${k === 'reg' ? 'Regulation' : k === 'inq' ? 'Inquiry' : k === 'lis' ? 'Listening' : k === 'rea' ? 'Reasoning' : 'Integration'} }}</span>
+        <span class="val" id="xp-val-${k}">0</span>
+      </div>
+      <div class="xp-track"><div class="xp-fill ${k}" id="xp-fill-${k}" style="width:0%"></div></div>
+    </div>
+  `).join('');
+  // Fix template literal issue
+  bars.querySelectorAll('.xp-label .name').forEach((el, i) => {
+    el.textContent = ['Regulation','Inquiry','Listening','Reasoning','Integration'][i];
+  });
+}
+
+function buildRoundPips() {
+  const pips = document.getElementById('round-pips');
+  pips.innerHTML = simulation.rounds.map((r, i) => `
+    <div class="round-pip ${i === 0 ? 'active' : ''}" id="pip-${i}">${i+1}</div>
+  `).join('');
+}
+
+function updateXPDisplay() {
+  const keys = ['reg','inq','lis','rea','int'];
+  keys.forEach(k => {
+    const val = state.xp[k];
+    const maxXP = 5;
+    const pct = Math.max(0, Math.min(100, (val / maxXP) * 100));
+    const fillEl = document.getElementById(`xp-fill-${k}`);
+    const valEl = document.getElementById(`xp-val-${k}`);
+    if (fillEl) { fillEl.style.width = pct + '%'; fillEl.classList.add('xp-flash'); setTimeout(() => fillEl.classList.remove('xp-flash'), 600); }
+    if (valEl) valEl.textContent = val >= 0 ? '+' + val : val;
+  });
+  updateNavXP();
+}
+
+function updateNavXP() {
+  ['reg','inq','lis','rea','int'].forEach(k => {
+    const el = document.getElementById('nav-' + k);
+    if (el) el.textContent = state.xp[k] >= 0 ? '+' + state.xp[k] : state.xp[k];
+  });
+}
+
+function renderRound(index) {
+  if (index >= simulation.rounds.length) { showEndScreen(); return; }
+  const round = simulation.rounds[index];
+  state.currentRound = index;
+
+  // Update pips
+  document.querySelectorAll('.round-pip').forEach((p, i) => {
+    p.className = 'round-pip' + (i < index ? ' done' : '') + (i === index ? ' active' : '');
+    if (i < index) p.textContent = '✓';
+    else p.textContent = i + 1;
+  });
+
+  // Update hint
+  document.getElementById('hint-box').innerHTML = `<strong>◈ ${round.skill}</strong>${round.hint}`;
+
+  const main = document.getElementById('sim-main');
+  main.innerHTML = '';
+
+  // Header
+  const header = document.createElement('div');
+  header.className = 'sim-scenario-header fade-in';
+  header.innerHTML = `
+    <div>
+      <div class="sim-round-label">${round.label} of ${simulation.rounds.length}</div>
+      <div class="sim-round-title">${round.title}</div>
+    </div>
+    <div class="skill-badge">Skill: ${round.skill}</div>
+  `;
+  main.appendChild(header);
+
+  // Context (first round only)
+  if (index === 0) {
+    const ctx = document.createElement('div');
+    ctx.className = 'speech-bubble fade-in';
+    ctx.innerHTML = `<div class="speaker-tag">⚡ Scenario Context</div><div class="speech-text">${simulation.context}<br><br><em>Goal: ${simulation.goal}</em></div>`;
+    main.appendChild(ctx);
+  }
+
+  // Speech bubble
+  if (round.speech) {
+    const sb = document.createElement('div');
+    sb.className = 'speech-bubble fade-in';
+    sb.innerHTML = `<div class="speaker-tag">${round.speech.speaker}</div><div class="speech-text">"${round.speech.text}"</div>`;
+    main.appendChild(sb);
+  }
+
+  // Advanced path check
+  if (round.advancedPath && round.advancedPath.condition(state)) {
+    const advBanner = document.createElement('div');
+    advBanner.className = 'feedback-box good fade-in';
+    advBanner.innerHTML = `<div class="feedback-title">🔓 Advanced Path Available</div>Your curiosity and listening scores unlocked a bonus option below.`;
+    main.appendChild(advBanner);
+  }
+
+  // Prompt
+  const promptEl = document.createElement('div');
+  promptEl.className = 'prompt-text fade-in';
+  promptEl.textContent = round.prompt;
+  main.appendChild(promptEl);
+
+  // Choices
+  const choicesDiv = document.createElement('div');
+  choicesDiv.className = 'choices fade-in';
+
+  // Add advanced path if unlocked
+  const allChoices = [...round.choices];
+  let advancedIndex = -1;
+  if (round.advancedPath && round.advancedPath.condition(state)) {
+    advancedIndex = allChoices.length;
+    allChoices.push({
+      text: round.advancedPath.text,
+      xp: round.advancedPath.bonus,
+      quality: 'good',
+      feedback: round.advancedPath.feedback,
+      label: '⭐ Advanced',
+      isAdvanced: true
+    });
+  }
+
+  allChoices.forEach((choice, ci) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML = `<span class="choice-letter">${String.fromCharCode(65+ci)})</span>${choice.isAdvanced ? `<strong style="color:var(--accent)">🔓 Bonus:</strong> ` : ''}${choice.text}`;
+    if (choice.isAdvanced) btn.style.borderColor = 'var(--accent)';
+    btn.addEventListener('click', () => handleChoice(round, allChoices, ci, choicesDiv, main));
+    choicesDiv.appendChild(btn);
+  });
+  main.appendChild(choicesDiv);
+}
+
+function handleChoice(round, choices, chosen, choicesDiv, main) {
+  const choice = choices[chosen];
+
+  // Disable all buttons
+  choicesDiv.querySelectorAll('.choice-btn').forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === chosen) btn.classList.add(choice.quality === 'good' ? 'correct' : choice.quality === 'ok' ? 'ok' : 'wrong');
+    if (i === round.correct && i !== chosen) btn.classList.add('missed');
+  });
+
+  // Apply XP
+  if (choice.xp) {
+    Object.entries(choice.xp).forEach(([k, v]) => {
+      state.xp[k] = (state.xp[k] || 0) + v;
+    });
+  }
+  if (choice.xp && choice.xp.reg < 0) state.flags.regulationFailed = true;
+  updateXPDisplay();
+  state.roundResults.push({ round: round.id, quality: choice.quality });
+
+  // Feedback
+  const fb = document.createElement('div');
+  fb.className = `feedback-box ${choice.quality} fade-in`;
+  const titleMap = { good: '✓ Strong Move', ok: '△ Acceptable', bad: '⚠ Weak Move' };
+  fb.innerHTML = `<div class="feedback-title">${titleMap[choice.quality]} — ${choice.label || ''}</div>${choice.feedback}`;
+  main.appendChild(fb);
+
+  // Evidence bonus
+  if (round.evidenceBonus && choice.quality === 'good') {
+    setTimeout(() => renderEvidenceBonus(round, main), 400);
+    return;
+  }
+
+  // Continue button
+  setTimeout(() => {
+    const cont = document.createElement('button');
+    cont.className = 'continue-btn';
+    const isLast = state.currentRound >= simulation.rounds.length - 1;
+    cont.textContent = isLast ? 'See Results →' : 'Next Round →';
+    cont.addEventListener('click', () => renderRound(state.currentRound + 1));
+    main.appendChild(cont);
+    main.scrollTo({ top: main.scrollHeight, behavior: 'smooth' });
+  }, 400);
+}
+
+function renderEvidenceBonus(round, main) {
+  const bonus = round.evidenceBonus;
+  const bonusDiv = document.createElement('div');
+  bonusDiv.className = 'fade-in';
+  bonusDiv.innerHTML = `<div class="prompt-text" style="margin-top:8px">${bonus.prompt}</div>`;
+  const bonusChoices = document.createElement('div');
+  bonusChoices.className = 'choices';
+  bonus.choices.forEach((bc, bi) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML = `<span class="choice-letter">${String.fromCharCode(65+bi)})</span>${bc.text}`;
+    btn.addEventListener('click', () => {
+      bonusChoices.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+      btn.classList.add(bc.quality === 'good' ? 'correct' : 'ok');
+      if (bc.xp) Object.entries(bc.xp).forEach(([k,v]) => state.xp[k] = (state.xp[k]||0) + v);
+      updateXPDisplay();
+      const fb2 = document.createElement('div');
+      fb2.className = `feedback-box ${bc.quality} fade-in`;
+      fb2.innerHTML = `<div class="feedback-title">${bc.quality === 'good' ? '✓ Bonus XP' : '△ No Bonus'}</div>${bc.feedback}`;
+      bonusDiv.appendChild(fb2);
+      setTimeout(() => {
+        const cont = document.createElement('button');
+        cont.className = 'continue-btn';
+        cont.textContent = 'Next Round →';
+        cont.addEventListener('click', () => renderRound(state.currentRound + 1));
+        bonusDiv.appendChild(cont);
+        main.scrollTo({ top: main.scrollHeight, behavior: 'smooth' });
+      }, 300);
+    });
+    bonusChoices.appendChild(btn);
+  });
+  bonusDiv.appendChild(bonusChoices);
+  main.appendChild(bonusDiv);
+  main.scrollTo({ top: main.scrollHeight, behavior: 'smooth' });
+}
+
+function showEndScreen() {
+  showScreen('endscreen');
+  const { xp } = state;
+  const advanced = xp.reg >= 1 && xp.lis >= 2 && xp.inq >= 2;
+
+  // Title
+  let title = 'Partial Stability';
+  let subtitle = 'You kept the conversation going. Review regulation and listening.';
+  if (advanced) { title = 'Strategic Resolution'; subtitle = 'You demonstrated foundational mastery across regulation, curiosity, and listening.'; }
+  else if (xp.lis >= 3) { title = 'Strong Listener'; subtitle = 'Your paraphrasing and empathy were a genuine strength this simulation.'; }
+  else if (xp.inq >= 3) { title = 'Curious Investigator'; subtitle = 'Your questioning kept the conversation open and productive.'; }
+  else if (xp.reg >= 1) { title = 'Steady Operator'; subtitle = 'You maintained regulation throughout. Build curiosity and listening next.'; }
+
+  document.getElementById('end-title').textContent = title;
+  document.getElementById('end-subtitle').textContent = subtitle;
+
+  const categories = [
+    { key: 'reg', name: 'Regulation', icon: '🧠', max: 3 },
+    { key: 'inq', name: 'Inquiry', icon: '🔍', max: 4 },
+    { key: 'lis', name: 'Listening', icon: '👂', max: 5 },
+    { key: 'rea', name: 'Reasoning', icon: '⚖️', max: 3 },
+    { key: 'int', name: 'Integration', icon: '🌉', max: 3 }
+  ];
+
+  const resultsEl = document.getElementById('end-results');
+  resultsEl.innerHTML = categories.map(c => {
+    const val = Math.max(0, xp[c.key]);
+    const highlight = val >= c.max - 1;
+    return `<div class="result-card ${highlight ? 'highlight' : ''}">
+      <div class="result-icon">${c.icon}</div>
+      <div class="result-name">${c.name}</div>
+      <div class="result-score">${val >= 0 ? '+' : ''}${val}</div>
+    </div>`;
+  }).join('');
+
+  const unlockBanner = document.getElementById('unlock-banner');
+  const unlockText = document.getElementById('unlock-text');
+  if (advanced) {
+    unlockBanner.classList.add('show');
+    unlockText.textContent = 'Advanced Simulation Mode — harder choices, no obvious wrong answers';
+  } else {
+    unlockBanner.classList.remove('show');
+  }
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+updateNavXP();
+</script>
+</body>
+</html>
